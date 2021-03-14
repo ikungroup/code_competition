@@ -96,5 +96,4 @@ def pack_item(bins,item):
 
 if __name__ == '__main__':
     bins=ffd(bin_cls,items)
-    a = 2
 
