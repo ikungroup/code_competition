@@ -3,7 +3,7 @@ Array_sever = [[0, 0, 0, 0]]
 Vm_sever = [[0, 0, 0]]
 Num = 0
 
-f = open(r"training-1.txt", "r")
+f = open(r"/Users/lianxing/Desktop/server/test/data/training-1.txt", "r")
 All = f.readlines()
 
 for frist in All:
