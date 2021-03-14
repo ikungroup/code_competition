@@ -46,11 +46,6 @@ def bf(bin_cap,item):
                 bf_cap_remain = cap_remain
                 bf_num = i
     return bf_num,bf_cap_remain
-a=2
-bin_cap = [10,6,4,5,3]
-bf_num,bf_cap_remain = bf(bin_cap,11)
-o=2
-
 
 
 def sort_items(items):
@@ -61,9 +56,7 @@ def sort_items(items):
                 items[i],items[j] = items[j],items[i]
     items.reverse()
     return items
-a= sort_items(items)
 
-print(a)
 
 bins_res,bins_used =  bfd(bin,items)
 print('箱子的剩余容量',bins_res)
