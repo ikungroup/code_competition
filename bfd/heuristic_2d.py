@@ -30,7 +30,7 @@ def sort_bins(bins):
     items = np.delete(items, 0, axis=1)
 
     return bins
-
+a=2
 #Best Bin Decearsing methods
 def bfd(bin_cls,items):
 
