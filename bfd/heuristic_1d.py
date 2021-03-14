@@ -1,3 +1,10 @@
+'''
+在一维问题下的装箱问题实现算法，使用BFD(Best Fit Descreasing)算法
+'''
+
+
+
+
 import numpy as np
 bin = 10
 items = [4,9,8,2,6]
@@ -39,7 +46,7 @@ def bf(bin_cap,item):
                 bf_cap_remain = cap_remain
                 bf_num = i
     return bf_num,bf_cap_remain
-
+a=2
 bin_cap = [10,6,4,5,3]
 bf_num,bf_cap_remain = bf(bin_cap,11)
 o=2
