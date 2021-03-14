@@ -12,7 +12,7 @@ def bfd(bin_cap,items):
     for item_num in range(len(items)):
         bf_num, bf_cap_remain = bf(bins,items[item_num])
         # 如果当前箱子内装不下物品但是全空的箱子可以，创建新的空箱子
-        if (bf_num == -1) and (items[item_num] < bin_cap):
+        if (bf_num == -1) and (items[item_num] <= bin_cap):
             bins.append(bin_cap - items[item_num])
             continue
         elif (bf_num == -1): #如果没有箱子可以装下
