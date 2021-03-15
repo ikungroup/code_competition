@@ -6,8 +6,10 @@ vir_req: 虚拟机请求 [[0/1，虚拟机编号],...,[...]]  vir_req_n * 3
 vir_need: 虚拟机需求 [[CPU,内存],...,[CPU，内存]] vir_need_n * 2
 ser_used: 服务器的使用列表 [[编号，CPU剩余，内存剩余],...,[...]] ser_used_n*3
 '''
-
+from utils.data_load import read_file
 import numpy as np
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 bin_cls = np.array([1,32,128])
 items = np.array([[1,8,12],[2,4,12],[3,32,42],[4,24,32]])
 bin_cpu_cap = 32   #CPU维度的最大容量
@@ -96,4 +98,13 @@ def pack_item(bins,item):
 
 
 if __name__ == '__main__':
+    data_dir = os.path.join(BASE_DIR, "..", "data", "training-1.txt")
+    vm_cls, sever_cls = read_file(data_dir)
+    ONE_DAY = True
+    if ONE_DAY:
+        vm_cls = np.delete(vm_cls,3,axis=1)
+    #获取第一天的数据
+
+
+    vm_cls = sort_items(vm_cls)
     bins=ffd(bin_cls,items)
