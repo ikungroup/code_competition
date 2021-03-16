@@ -1,6 +1,6 @@
 import numpy as np
-
-
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def extract(frist):  # 将数据提取出来
     second = frist[:-1].strip(')')
     third = second.strip('(')
@@ -52,15 +52,17 @@ def read_file(file_path):
     Vm_add = np.array(Vm_add)
 
     # 给服务器和虚拟机数组前面标序号
-    # sever_array = np.concatenate((np.arange(0, len(sever_array))[np.newaxis, :].T, sever_array), axis=1)
-    # vm_array = np.concatenate((np.arange(0, len(vm_array))[np.newaxis, :].T, vm_array), axis=1)
-
+    sever_array = np.concatenate((np.arange(0, len(sever_array))[np.newaxis, :].T, sever_array), axis=1)
+    vm_array = np.concatenate((np.arange(0, len(vm_array))[np.newaxis, :].T, vm_array), axis=1)
+    sever_array = sever_array.astype(int)
+    vm_array = vm_array.astype(int)
     return sever_array, vm_array
 
 
 if __name__ == '__main__':
-    file_path = "C:\\Users\\Valar Morghulis\\Desktop\\华为精英挑战赛\\training-1.txt"
-    sever_cls, vm_cls = read_file(file_path)
+    data_dir = os.path.join(BASE_DIR, "..", "data", "training-1.txt")
+    # file_path = "C:\\Users\\Valar Morghulis\\Desktop\\华为精英挑战赛\\training-1.txt"
+    sever_cls, vm_cls = read_file(data_dir)
     print('1')
 
 
