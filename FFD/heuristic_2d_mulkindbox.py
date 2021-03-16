@@ -11,10 +11,6 @@ import numpy as np
 import os
 np.set_printoptions(suppress=True) #不以科学计数法输出
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# bin_cls = np.array([1,32,128])
-# items = np.array([[1,8,12],[2,4,12],[3,32,42],[4,24,32]])
-# bin_cpu_cap = 32   #CPU维度的最大容量
-# bin_mem_cap = 128  #内存维度的最大容量
 ID = 2
 
 
@@ -164,28 +160,18 @@ def heuristic(vir_need,sever_cls):
 
     return sever_used
 
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     data_dir = os.path.join(BASE_DIR, "..", "data", "training-1.txt")
     sever_cls,vm_cls = read_file(data_dir)
     ONE_DAY = True
-    if ONE_DAY:
+    if ONE_DAY: #删除了不必要的数据
         vm_cls = np.delete(vm_cls,3,axis=1)
         sever_cls = np.delete(sever_cls,3,axis=1)
         sever_cls = np.delete(sever_cls,3,axis=1)
 
     #获取第一天的数据
 
-    vm_cls = sort_items(vm_cls)
-    sever_cls = sort_bins(sever_cls)
-    sever_used= heuristic(vm_cls,sever_cls)
+    vm_cls = sort_items(vm_cls) #虚拟机排序，两者原理相同
+    sever_cls = sort_bins(sever_cls) #服务器排序
+    sever_used= heuristic(vm_cls,sever_cls)#以vm_cls作为虚拟机需求，实际情况需要对第一天数据进行解析
     a=2
