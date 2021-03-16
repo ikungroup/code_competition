@@ -93,7 +93,6 @@ def best_fit_sever(sever_cls,vir):
     sever = sever_cls[0,:]
     return sever
 
-def alloc_id()
 
 def assign(vir,sever,sever_used,in_use=False,first_alloc=False):
     '''
@@ -155,39 +154,12 @@ def heuristic(vir_need,sever_cls):
 
 
 
-
-
-
-
-
     return vir_need
 
 
 
 
 
-
-def pack_item(bins,item):
-    '''
-    对已经排好序的物品和箱子进行装箱
-    :param bins: 箱子序列，格式为[[序号，物品CPU,物品内存],...,[...]]
-    :param item: 待排序的物品，格式为[序号，物品CPU,物品内存]
-    :return: 装箱结束后的箱子
-    '''
-
-    item_cpu,item_mem = item[1],item[2]
-
-    for bin_num in range(len(bins)):
-        bin_cpu, bin_mem = bins[bin_num][1], bins[bin_num][2]
-        if (item_cpu <= bin_cpu) and (item_mem <= bin_mem):
-            bins[bin_num][1], bins[bin_num][2] = bin_cpu-item_cpu,bin_mem-item_mem
-            return bins
-
-    # 原来箱子剩余容量不足以放入物品，加入新的箱子
-    if (item_cpu <= bin_cpu_cap) and (item_mem <= bin_mem_cap):
-        bins = np.insert(bins, 0, np.array([bin_cls]), axis=0)
-        bins[0][1], bins[0][2] = bins[0][1] - item_cpu, bins[0][2] - item_mem
-        return bins
 
 
 
@@ -210,4 +182,3 @@ if __name__ == '__main__':
     vm_cls = sort_items(vm_cls)
     sever_cls = sort_bins(sever_cls)
     heuristic(vm_cls,sever_cls)
-    bins=ffd(bin_cls,items)
