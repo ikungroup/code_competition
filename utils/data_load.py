@@ -1,56 +1,66 @@
 import numpy as np
 
 
+def extract(frist):  # 将数据提取出来
+    second = frist[:-1].strip(')')
+    third = second.strip('(')
+    final = third.split(', ')
+    return final
+
+    # list = ['60', '50', '45']
+    # dict = {}
+    # dict['one'] = list
+    #
+    #
+    # print (dict['one'])       # 输出键为 'one' 的值
+
+
 def read_file(file_path):
     f = open(file_path, "r")
-    sever_cls = [[0, 0, 0, 0]]
-    vm_cls = [[0, 0, 0]]
-    Num = 0
+
+    sever_name = []  # 服务器名称
+    vm_name = []  # 虚拟机名称
+    sever_array = []  # 服务器数据数组
+    vm_array = []  # 虚拟机数据数组
+
+    Vm_add = []  # 第一天add虚拟机参数
+    num = 0
     All = f.readlines()
     for frist in All:
 
-        if Num == 1:
-            if not frist[:-1].isdigit():
-                second = frist[:-1].strip(')')
-                third = second.strip('(')
-                Final = third.split(', ')
-                sever_cls = np.concatenate((sever_cls, [Final[1:]]), axis=0)
-        elif Num == 2:
-            if not frist[:-1].isdigit():
-                second = frist[:-1].strip(')')
-                third = second.strip('(')
-                Final = third.split(', ')
-                vm_cls = np.concatenate((vm_cls, [Final[1:]]), axis=0)
+        if frist[:-1].isdigit():
+            num += 1
+            if num == 3:
+                days = int(frist[:-1])  # 用户使用天数
+            continue
+        if num == 1:  # 服务器数据提取
+            sever_array.append(extract(frist)[1:])
+            sever_name.append(extract(frist)[:1])
+            # sever_array = np.concatenate((sever_array, [Final[1:]]), axis=0)
 
-        elif Num == 3:
-            all_day = int(frist[:-1])
-            # 剩下的是每天的增删操作
-        if frist[:-1].isdigit():  # 下一行判断
-            Num += 1
+        elif num == 2:  # 虚拟机数据提取
+            vm_array.append(extract(frist)[1:])
+            vm_name.append(extract(frist)[:1])
+            # vm_array = np.concatenate((vm_array, [Final[1:]]), axis=0)
 
-    # second = frist[:-1].strip(')')
-    # third = second.strip('(')
-    # Final = third.split(', ')
-    # New.append(Final)
-    # Array_sever.append(np.array(Final[1:]))
+        elif num == 4:  # 每天增减虚拟机数据提取
+            if extract(frist)[0] == 'add':
+                Vm_add.append(vm_array[vm_name.index([extract(frist)[1]])])
 
-    vm_cls = np.delete(vm_cls, 0, 0)
-    sever_cls = np.delete(sever_cls, 0, 0)
+    sever_array = np.array(sever_array)
+    vm_array = np.array(vm_array)
+    Vm_add = np.array(Vm_add)
 
-    #转化为整数，添加类别列
-    sever_cls = sever_cls.astype('int')
-    server_num = [x for x in range(len(sever_cls))]
-    sever_cls = np.insert(sever_cls, 0, server_num, 1)
-    # sever_cls = sever_cls.astype('int')
+    # 给服务器和虚拟机数组前面标序号
+    # sever_array = np.concatenate((np.arange(0, len(sever_array))[np.newaxis, :].T, sever_array), axis=1)
+    # vm_array = np.concatenate((np.arange(0, len(vm_array))[np.newaxis, :].T, vm_array), axis=1)
 
-    vm_cls = vm_cls.astype(int)
-    vm_num = [[x for x in range(len(vm_cls))]]
-    vm_cls = np.insert(vm_cls, 0, vm_num, axis=1)
-    return vm_cls,sever_cls
+    return sever_array, vm_array
+
 
 if __name__ == '__main__':
-    file_path = "C:\\Users\\王连兴\\Desktop\\competition\\data\\training-1.txt"
-    vm_cls,sever_cls = read_file(file_path)
-   
-    a=2
+    file_path = "C:\\Users\\Valar Morghulis\\Desktop\\华为精英挑战赛\\training-1.txt"
+    sever_cls, vm_cls = read_file(file_path)
+    print('1')
+
 
