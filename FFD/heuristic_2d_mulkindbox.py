@@ -82,14 +82,20 @@ def best_fit_sever(sever_cls,vir):
     :param vir: 需要分配的虚拟机[编号，CPU，内存]
     :return sever: 最合适的服务器 [编号，CPU，内存]
     '''
-    sever_cls = fit_sever(sever_cls,vir) #首先找到能够容下服务器的列表
-    scores = sever_cls
-    scores[:,1:] = np.divide(vir[1:],sever_cls[:,1:])
 
-
+    scores = sever_cls.copy()
+    scores[:,1:] = np.divide(vir[1:],scores[:,1:])
+    scores[:, 1:] = np.sum(scores[:, 1:], axis=1, keepdims=1)
+    scores = scores[:, 1]
+    sever_cls = np.insert(sever_cls, 0, np.array([scores]), axis=1)
+    sever_cls = sever_cls[sever_cls[:, 0].argsort()[::-1]]
+    sever_cls = np.delete(sever_cls,0,axis=1)
+    sever = sever_cls[0,:]
     return sever
 
-def assign(vir,sever,cpu_lab=1,mem_lab=2):
+def alloc_id()
+
+def assign(vir,sever,sever_used,in_use=False,first_alloc=False):
     '''
     对服务器分配CPU，内存，返回分配后服务器参数
     :param vir: 虚拟机 [编号，CPU，内存]
@@ -98,33 +104,63 @@ def assign(vir,sever,cpu_lab=1,mem_lab=2):
     :param end: 结束分配的序号
     :return: 分配后的服务器
     '''
+    sever[1] = sever[1] - vir[1]
+    sever[2] = sever[2] - vir[2]
+    if first_alloc == True:
+        sever_used = np.array([sever])
+        return sever_used
 
-    sever[cpu_lab] = sever[cpu_lab] - vir[cpu_lab]
-    sever[mem_lab] = sever[mem_lab] - vir[mem_lab]
+    if in_use == False: #如果分配的服务器目前不在使用
+        sever_used = np.append(sever_used,np.array([sever]),axis=0)
+    else:
+        index = np.squeeze(np.where(sever_used[:,0] == sever[0]))
+        sever_used[index,1] = sever[1]
+        sever_used[index, 2] = sever[2]
 
-    return sever
-
+    return sever_used
 
 
 def first_assign(sever_cls,vir_need):
     vir = find_first_vir(vir_need)
     vir = vir_need[0]
+    sever_cls = fit_sever(sever_cls, vir)  # 首先找到能够容下服务器的列表
     sever = best_fit_sever(sever_cls,vir)
-    sever = assign(vir,sever)
-    sever_used = np.array([[sever]])
+    sever_used = assign(vir, sever,sever_used=[[]],in_use=False,first_alloc=True)
+    # sever[1] = sever[1] - vir[1]
+    # sever[2] = sever[2] - vir[2]
+    # sever_used = np.array([sever])
+    vir_need = np.delete(vir_need,0,axis=0)
 
     return sever_used,vir_need
 
 
-def heuristic(vir_need,sever_cls,):
+def heuristic(vir_need,sever_cls):
     #首先对虚拟机进行排序
     vir_need = sort_items(vir_need)
     sever_used,vir_need = first_assign(sever_cls,vir_need)
 
+    for i in range(len(vir_need)):
+        fit_sever_cls = fit_sever(sever_used,vir_need[i])
+        if len(fit_sever_cls) == 0: #已经使用服务器中没有合适容量的
+            fit_sever_cls = fit_sever(sever_cls,vir_need[i])
+            sever = best_fit_sever(fit_sever_cls,vir_need[i])
+            sever_used = assign(vir_need[i],sever,sever_used,in_use=False)
+            # sever_used = np.append(sever_used,np.array([sever]),axis=0)
+        else:#已经使用服务器中有合适的
+            sever = best_fit_sever(fit_sever_cls,vir_need[i])
+            sever_used = assign(vir_need[i], sever,sever_used,in_use=True)
+
+    a = 2
 
 
 
 
+
+
+
+
+
+    return vir_need
 
 
 
@@ -173,4 +209,5 @@ if __name__ == '__main__':
 
     vm_cls = sort_items(vm_cls)
     sever_cls = sort_bins(sever_cls)
+    heuristic(vm_cls,sever_cls)
     bins=ffd(bin_cls,items)
