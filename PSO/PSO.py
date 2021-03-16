@@ -18,14 +18,14 @@ class PSO:
 #fitFunc 表示目标函数，本文需要求出目标函数的最小值（目标函数需要设置）
     def initbirds(self,size,solutionspace):
         birds = []
-        for i in range(size)
+        for i in range(size):
             position = random.uniform(solutionspace[0],solutionspace[1])
             speed = 0
             fit = self.fitFunc(position)
-            birds.append(bird(speed,position,fit,position,fit))
+            birds.append(birds(speed,position,fit,position,fit))
             best = birds[0]
         for bird in birds:
-            if bird.fit > best.fit
+            if bird.fit > best.fit:
                     best = bird
         return birds,best
 
