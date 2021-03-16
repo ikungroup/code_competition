@@ -61,6 +61,6 @@ def read_file(file_path):
 if __name__ == '__main__':
     file_path = "C:\\Users\\Valar Morghulis\\Desktop\\华为精英挑战赛\\training-1.txt"
     sever_cls, vm_cls = read_file(file_path)
-    print('0')
+    print('1')
 
 
