@@ -9,6 +9,7 @@ ser_used: 服务器的使用列表 [[编号，CPU剩余，内存剩余],...,[...
 from utils.data_load import read_file
 import numpy as np
 import os
+np.set_printoptions(suppress=True) #不以科学计数法输出
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 bin_cls = np.array([1,32,128])
 items = np.array([[1,8,12],[2,4,12],[3,32,42],[4,24,32]])
@@ -34,37 +35,97 @@ def sort_items(items):
 
     return items
 
-# def sort_bins(bins):
-#     '''
-#       对箱子进行排序，以箱子在维度上的容量比上总容量作为重要性，最后对各个维度相加
-#     :param bins:  箱子 [[箱子种类编号，CPU，内存]，...，[...]]
-#     :return:  按照重要性程度排序后的箱子 [[箱子编号，CPU，内存]，...，[...]]
-#     '''
-#     scores = bins.astype(np.float64)
-#     belta_1 = 1 / sum(bins[:, 1:])  # 用于评价物品各个维度重要性的参数
-#     scores[:, 1:] = belta_1 * bins[:, 1:]
-#     scores[:, 1:] = np.sum(scores[:, 1:], axis=1, keepdims=1)
-#     scores = scores[:, :2]
-#     # scores = scores[scores[:,1].argsort()[::-1]]
-#     items = np.insert(bins.astype(np.float64), 0, np.array(scores[:, 1]), axis=1)
-#     items = items[items[:, 0].argsort()[::-1]]
-#     items = np.delete(items, 0, axis=1)
-#
-#     return bins
+def sort_bins(bins):
+    '''
+      对箱子进行排序，以箱子在维度上的容量比上总容量作为重要性，最后对各个维度相加
+    :param bins:  箱子 [[箱子种类编号，CPU，内存]，...，[...]]
+    :return:  按照重要性程度排序后的箱子 [[箱子编号，CPU，内存]，...，[...]]
+    '''
+    scores = bins.astype(np.float64)
+    belta_1 = 1 / sum(bins[:, 1:])  # 用于评价物品各个维度重要性的参数
+    scores[:, 1:] = belta_1 * bins[:, 1:]
+    scores[:, 1:] = np.sum(scores[:, 1:], axis=1, keepdims=1)
+    scores = scores[:, :2]
+    # scores = scores[scores[:,1].argsort()[::-1]]
+    bins = np.insert(bins.astype(np.float64), 0, np.array(scores[:, 1]), axis=1)
+    bins = bins[bins[:, 0].argsort()[::-1]]
+    bins = np.delete(bins, 0, axis=1)
 
-
-#First Fit Decearsing methods
-def ffd(bin_cls,items):
-
-
-    items = sort_items(items) #sort the items
-    if len(items) > 0:
-        bins = np.array([bin_cls])
-    # bins = sort_bins(bins)  因为只有一种箱子，所以不需要排序
-    for item_num in range(len(items)):
-        # for bins_num in range(len(bins)):
-        bins = pack_item(bins,items[item_num])
     return bins
+
+
+def find_first_vir(vir_need,mode='max'):
+    if mode == 'max':
+        return vir_need[0]
+
+
+def fit_sever(sever_cls,vir,cpu_lab=1,mem_lab=2):
+    '''
+    找到服务器列表中能够装下虚拟机的返回
+    :param sever_cls: 服务器列表 [[编号，CPU，内存],...,[...]]
+    :param vir: 虚拟机[编号，CPU，内存]
+    :return: 返回能够装下服务器的列表 [[编号，CPU，内存],...,[...]]
+    '''
+    new_sever_cls = [[0,0,0]]
+    for i in range(len(sever_cls)):
+        if (sever_cls[i][cpu_lab] >= vir[cpu_lab]) and (sever_cls[i][mem_lab] >= vir[mem_lab]):
+            new_sever_cls = np.append(new_sever_cls,np.array([sever_cls[i]]),axis=0)
+    new_sever_cls = np.delete(new_sever_cls,0,axis=0)
+
+    return new_sever_cls
+
+
+def best_fit_sever(sever_cls,vir):
+    '''
+    在服务器列表中找到最适合虚拟机的服务器进行分配
+    :param sever_cls: 服务器种类列表或者使用的服务器列表 [[编号，CPU，内存],...,[...]]
+    :param vir: 需要分配的虚拟机[编号，CPU，内存]
+    :return sever: 最合适的服务器 [编号，CPU，内存]
+    '''
+    sever_cls = fit_sever(sever_cls,vir) #首先找到能够容下服务器的列表
+    scores = sever_cls
+    scores[:,1:] = np.divide(vir[1:],sever_cls[:,1:])
+
+
+    return sever
+
+def assign(vir,sever,cpu_lab=1,mem_lab=2):
+    '''
+    对服务器分配CPU，内存，返回分配后服务器参数
+    :param vir: 虚拟机 [编号，CPU，内存]
+    :param sever: 服务器 [编号，CPU，内存]
+    :param start: 开始进行分配的序号
+    :param end: 结束分配的序号
+    :return: 分配后的服务器
+    '''
+
+    sever[cpu_lab] = sever[cpu_lab] - vir[cpu_lab]
+    sever[mem_lab] = sever[mem_lab] - vir[mem_lab]
+
+    return sever
+
+
+
+def first_assign(sever_cls,vir_need):
+    vir = find_first_vir(vir_need)
+    vir = vir_need[0]
+    sever = best_fit_sever(sever_cls,vir)
+    sever = assign(vir,sever)
+    sever_used = np.array([[sever]])
+
+    return sever_used,vir_need
+
+
+def heuristic(vir_need,sever_cls,):
+    #首先对虚拟机进行排序
+    vir_need = sort_items(vir_need)
+    sever_used,vir_need = first_assign(sever_cls,vir_need)
+
+
+
+
+
+
 
 
 
@@ -103,8 +164,13 @@ if __name__ == '__main__':
     ONE_DAY = True
     if ONE_DAY:
         vm_cls = np.delete(vm_cls,3,axis=1)
+        sever_cls = np.delete(sever_cls,3,axis=1)
+        sever_cls = np.delete(sever_cls,3,axis=1)
+
     #获取第一天的数据
 
 
+
     vm_cls = sort_items(vm_cls)
+    sever_cls = sort_bins(sever_cls)
     bins=ffd(bin_cls,items)
