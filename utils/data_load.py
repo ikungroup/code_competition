@@ -52,8 +52,8 @@ def read_file(file_path):
     Vm_add = np.array(Vm_add)
 
     # 给服务器和虚拟机数组前面标序号
-    # sever_array = np.concatenate((np.arange(0, len(sever_array))[np.newaxis, :].T, sever_array), axis=1)
-    # vm_array = np.concatenate((np.arange(0, len(vm_array))[np.newaxis, :].T, vm_array), axis=1)
+    sever_array = np.concatenate((np.arange(0, len(sever_array))[np.newaxis, :].T, sever_array), axis=1)
+    vm_array = np.concatenate((np.arange(0, len(vm_array))[np.newaxis, :].T, vm_array), axis=1)
 
     return sever_array, vm_array
 
